@@ -15,8 +15,10 @@ const parseSortBy = (sortBy) => {
     'isFavorite',
     'contactType',
   ];
-  if (keyOfContacts.includes(sortBy)) return sortBy;
-  return '_id"';
+  if (keyOfContacts.includes(sortBy)) {
+    return sortBy;
+  }
+  return '_id';
 };
 
 export const parseSortParams = (query) => {

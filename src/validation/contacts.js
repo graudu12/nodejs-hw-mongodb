@@ -42,13 +42,11 @@ export const updateContactSchema = Joi.object({
     'string.min': 'Username should have at least 3 characters',
     'string.max': 'Username should have at most 20 characters',
   }),
-  phoneNumber: Joi.string()
-    .min(3)
-    .max(20)
-    .pattern(/^[0-9]{10,15}$/)
-    .messages({
-      'string.pattern.base': 'Phone number must have only numbers',
-    }),
+  phoneNumber: Joi.string().min(3).max(20).messages({
+    'string.empty': 'Phone number is required!',
+    'string.min': 'Phone number should have at least 3 characters',
+    'string.max': 'Phone number should have at most 20 characters',
+  }),
   email: Joi.string()
     .min(3)
     .max(20)
