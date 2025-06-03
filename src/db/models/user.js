@@ -1,6 +1,6 @@
-import { Schema, model } from 'mongoose';
+import mongoose from 'mongoose';
 
-const usersSchema = new Schema(
+const usersSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -21,10 +21,11 @@ const usersSchema = new Schema(
     versionKey: false,
   },
 );
+
 usersSchema.methods.toJSON = function () {
-  const object = this.toObject();
-  delete object.password;
-  return object;
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
 };
 
-export const UsersCollection = model('users', usersSchema);
+export const UsersCollection = mongoose.model('users', usersSchema);
