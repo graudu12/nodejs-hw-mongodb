@@ -124,6 +124,6 @@ export const patchContactController = async (req, res, next) => {
   res.status(200).send({
     status: 200,
     message: 'Successfully patched a contact!',
-    data: req.body,
+    data: result,
   });
 };
