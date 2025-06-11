@@ -1,4 +1,5 @@
 import createHttpError from 'http-errors';
+import { env } from '../utils/env.js';
 import {
   getAllContacts,
   getContactById,
@@ -10,6 +11,8 @@ import {
 import { parsePaginationParams } from '../utils/parsePaginationParams.js';
 import { parseSortParams } from '../utils/parseSortParams.js';
 import { parseFilterParams } from '../utils/parseFilterParams.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
 
 export const getContactsController = async (req, res) => {
   const { page, perPage } = parsePaginationParams(req.query);
@@ -49,6 +52,17 @@ export const getContactByIdController = async (req, res, next) => {
 };
 
 export const createContactController = async (req, res) => {
+  const photo = req.file;
+  let photoUrl;
+
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
+
   const contact = await createContact({
     name: req.body.name,
     phoneNumber: req.body.phoneNumber,
@@ -56,6 +70,7 @@ export const createContactController = async (req, res) => {
     isFavourite: req.body.isFavourite,
     contactType: req.body.contactType,
     userId: req.user._id,
+    photo: photoUrl,
   });
 
   res.status(201).send({
@@ -104,6 +119,17 @@ export const upsertContactController = async (req, res, next) => {
 
 export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
+  const photo = req.file;
+
+  let photoUrl;
+
+  if (photo) {
+    if (env('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
 
   const result = await patchContact(
     contactId,
@@ -113,6 +139,7 @@ export const patchContactController = async (req, res, next) => {
       email: req.body.email,
       isFavourite: req.body.isFavourite,
       contactType: req.body.contactType,
+      photo: photoUrl,
     },
     req.user._id,
   );
