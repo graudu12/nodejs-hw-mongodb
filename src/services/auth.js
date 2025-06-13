@@ -117,18 +117,11 @@ export const requestResetToken = async (email) => {
   });
 
   await sendEmail({
-    from: SMTP.FROM_EMAIL,
+    from: SMTP.SMTP_FROM_EMAIL,
     to: email,
     subject: 'Reset your password',
     html,
   });
-
-  if (!sendEmail) {
-    throw createHttpError(
-      500,
-      'Failed to send the email, please try again later.',
-    );
-  }
 };
 
 export const resetPassword = async (payload) => {
