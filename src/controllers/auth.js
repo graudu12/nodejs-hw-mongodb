@@ -3,8 +3,8 @@ import {
   loginUser,
   logoutUser,
   refreshUsersSession,
-  requestResetToken,
-  resetPassword,
+	requestResetToken,
+	resetPassword,
 } from '../services/auth.js';
 import { THIRTY_DAYS } from '../constants/index.js';
 
