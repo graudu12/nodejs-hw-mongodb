@@ -1,10 +1,9 @@
 import mongoose from 'mongoose';
 
-const sessionsSchema = new mongoose.Schema(
+const sessionSchema = mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      unique: true,
       required: true,
     },
     accessToken: {
@@ -25,8 +24,8 @@ const sessionsSchema = new mongoose.Schema(
     },
   },
   {
-    versionKey: false,
+    timestamps: true,
   },
 );
 
-export const SessionsCollection = mongoose.model('sessions', sessionsSchema);
+export const Session = mongoose.model('session', sessionSchema);
