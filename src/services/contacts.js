@@ -1,75 +1,67 @@
-import { ContactsCollection } from '../db/models/contact.js';
-import { calculatePaginationData } from '../utils/calculatePaginationData.js';
-import { SORT_ORDER } from '../constants/index.js';
+import { Contacts } from '../models/contact.js';
 
 export const getAllContacts = async ({
-  page = 1,
-  perPage = 10,
-  sortOrder = SORT_ORDER.ASC,
-  sortBy = '_id',
-  filter = {},
+  page,
+  perPage,
+  sortBy,
+  sortOrder,
+  filter,
   userId,
 }) => {
-  const limit = perPage;
-  const skip = (page - 1) * perPage;
-
-  const contactsQuery = ContactsCollection.find();
-
-  if (filter.isFavourite) {
-    contactsQuery.where('isFavourite').equals(filter.isFavourite);
+  const skip = page > 0 ? (page - 1) * perPage : 0;
+  const contactQuery = Contacts.find({ userId });
+  if (typeof filter.contactType !== 'undefined') {
+    contactQuery.where('contactType').equals(filter.contactType);
   }
-  if (filter.contactType) {
-    contactsQuery.where('contactType').equals(filter.contactType);
+  if (typeof filter.isFavourite !== 'undefined') {
+    contactQuery.where('isFavourite').equals(filter.isFavourite);
   }
-
-  contactsQuery.where('userId').equals(userId);
-
-  const [contactsCount, contacts] = await Promise.all([
-    ContactsCollection.find().merge(contactsQuery).countDocuments(),
-    contactsQuery
+  const [totalItems, contacts] = await Promise.all([
+    Contacts.countDocuments(contactQuery),
+    contactQuery
       .sort({ [sortBy]: sortOrder })
       .skip(skip)
-      .limit(limit)
-      .exec(),
+      .limit(perPage),
   ]);
 
-  const paginationData = calculatePaginationData(contactsCount, perPage, page);
-
+  console.log(contacts);
+  const totalPages = Math.ceil(totalItems / perPage);
   return {
-    data: contacts,
-    ...paginationData,
+    contacts,
+    page,
+    perPage: 20,
+    totalItems,
+    totalPages,
+    hasPreviousPage: page > 1,
+    hasNextPage: totalPages > page,
   };
 };
-
-export const getContactById = (contactId, userId) => {
-  return ContactsCollection.findOne({ _id: contactId, userId });
+export const getContactById = async (contactId, userId) => {
+  const contact = await Contacts.findOne({ _id: contactId, userId });
+  return contact;
 };
-
-export const createContact = (contact) => {
-  return ContactsCollection.create(contact);
+export const createContact = async (payload) => {
+  const contact = await Contacts.create(payload);
+  return contact;
 };
-
-export const deleteContact = (contactId, userId) => {
-  return ContactsCollection.findOneAndDelete({ _id: contactId, userId });
-};
-
-export const updateContact = (contactId, contact, userId) => {
-  return ContactsCollection.findOneAndUpdate(
-    { _id: contactId, userId },
-    contact,
+export const updateContact = async (contactId, userId, payload) => {
+  const updatedContact = await Contacts.findOneAndUpdate(
     {
-      new: true,
-      upsert: true,
+      _id: contactId,
+      userId,
     },
-  );
-};
-
-export const patchContact = (contactId, contact, userId) => {
-  return ContactsCollection.findOneAndUpdate(
-    { _id: contactId, userId },
-    contact,
+    payload,
     {
       new: true,
     },
   );
+  return updatedContact;
+};
+export const deleteContact = async (contactId, userId) => {
+  const deletedContact = await Contacts.findOneAndDelete({
+    _id: contactId,
+    userId,
+  });
+
+  return deletedContact;
 };
