@@ -10,7 +10,7 @@ import { Session } from '../models/session.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
 import { sendMail } from '../utils/sendMail.js';
 const RESET_PASSWORD = fs.readFileSync(
-  path.resolve('src', 'templates', 'reset-password.hbs'),
+  path.resolve('src', 'templates', 'reset-password.html'),
   'utf-8',
 );
 export const registerUser = async (payload) => {
