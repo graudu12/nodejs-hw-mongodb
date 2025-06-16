@@ -30,6 +30,7 @@ const contactSchema = mongoose.Schema(
     photo: {
       type: String,
       default: null,
+      select: true,
     },
   },
   { timestamps: true },

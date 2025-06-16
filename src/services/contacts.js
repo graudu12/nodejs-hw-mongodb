@@ -9,33 +9,37 @@ export const getAllContacts = async ({
   userId,
 }) => {
   const skip = page > 0 ? (page - 1) * perPage : 0;
-  const contactQuery = Contacts.find({ userId });
+
+  const filters = { userId };
   if (typeof filter.contactType !== 'undefined') {
-    contactQuery.where('contactType').equals(filter.contactType);
+    filters.contactType = filter.contactType;
   }
   if (typeof filter.isFavourite !== 'undefined') {
-    contactQuery.where('isFavourite').equals(filter.isFavourite);
+    filters.isFavourite = filter.isFavourite;
   }
+
   const [totalItems, contacts] = await Promise.all([
-    Contacts.countDocuments(contactQuery),
-    contactQuery
+    Contacts.countDocuments(filters),
+    Contacts.find(filters)
+      .select('+photo')
       .sort({ [sortBy]: sortOrder })
       .skip(skip)
       .limit(perPage),
   ]);
 
-  console.log(contacts);
   const totalPages = Math.ceil(totalItems / perPage);
+
   return {
     contacts,
     page,
-    perPage: 20,
+    perPage,
     totalItems,
     totalPages,
     hasPreviousPage: page > 1,
     hasNextPage: totalPages > page,
   };
 };
+
 export const getContactById = async (contactId, userId) => {
   const contact = await Contacts.findOne({ _id: contactId, userId });
   return contact;

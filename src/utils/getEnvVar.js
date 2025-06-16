@@ -9,5 +9,8 @@ export const getEnvVar = (name, defValue) => {
   if (defValue) {
     return defValue;
   }
+  if (defValue !== undefined) {
+    return defValue;
+  }
   throw new Error(`Missing: process.env['${name}'].`);
 };
