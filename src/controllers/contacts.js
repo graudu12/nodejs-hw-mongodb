@@ -30,7 +30,7 @@ const uploadHandlear = async (file) => {
       path.resolve('src', 'uploads', 'photos', file.filename),
     );
 
-    photo = `http://localhost:8080/avatars/${file.filename}`;
+    photo = `http://localhost:3000/avatars/${file.filename}`;
     return photo;
   }
 };
